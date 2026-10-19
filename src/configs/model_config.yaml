@@ -1,0 +1,49 @@
+prompt_generator:
+  name: qwen
+  model_id: Qwen/Qwen3.5-9B
+  dtype: bfloat16
+  device: cuda
+  trainable: true
+  enable_thinking: false
+  max_new_tokens: 320
+  temperature: 1.0
+  top_p: 0.95
+  layout_serialization: structured
+  lora:
+    r: 16
+    alpha: 32
+    dropout: 0.0
+    target_modules: [q_proj, k_proj, v_proj, o_proj, gate_proj, up_proj, down_proj]
+
+image_generator:
+  name: flux
+  model_id: black-forest-labs/FLUX.2-dev
+  dtype: bfloat16
+  device: cuda
+  height: 1024
+  width: 1024
+  num_inference_steps: 20
+  guidance_scale: 3.5
+  max_sequence_length: 512
+  device_map: balanced
+  enable_model_cpu_offload: false
+
+reward:
+  name: gdb
+  renders_dir: PATH/TO/IMAGES
+  device: cuda:1
+  palette_colors: 6
+  deltae_scale: 20.0
+  weights:
+    # -- text fidelity (0.25 / 2 metrics) --
+    color_deltae: 0.125                # CIEDE2000 image palette vs layout colours
+    ocr_accuracy: 0.125                # OCR read-back of the layout's text strings (lexical)
+    # -- perceptual quality / human-aligned preference (0.25 / 5 metrics) --
+    image_reward: 0.05                 # no-reference human-preference model (ImageReward)
+    nima: 0.05                         # no-reference NIMA aesthetic MOS (needs `pyiqa`)
+    dreamsim: 0.05                     # human-aligned perceptual similarity to the GT render
+    lpips: 0.05                        # learned perceptual similarity to the GT render
+    ssim: 0.05                         # structural similarity to the GT render
+    # -- spatial accuracy (0.25 / 2 metrics; finetuned YOLO-OBB detector) --
+    yolo_count_gt: 0.125               # component-count fidelity vs GT-render detections
+    yolo_count_meta: 0.125             # component-count fidelity vs layout metadata
