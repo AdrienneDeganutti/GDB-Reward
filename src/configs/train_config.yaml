@@ -1,0 +1,47 @@
+# Training configuration for GRPO fine-tuning of the prompt-generator LLM.
+
+model_config: model_config.yaml
+
+image_generator:
+  height: 768
+  width: 768
+
+seed: 0
+output_dir: PATH/TO/OUTPUTS
+
+cuda_visible_devices: "0,1,2,3,4,5,6,7"
+
+wandb:
+  enabled: true
+  project: PROJECT_NAME
+  entity: null
+  name: RUN_NAME
+  group: null
+  mode: online
+
+data:
+  layouts_dir: PATH/TO/layouts
+  annotations_dir: PATH/TO/annotations
+  split_csv: PATH/TO/train.csv
+  val_split_csv: PATH/TO/test.csv
+
+grpo:
+  steps: 1368
+  group_size: 12
+  layouts_per_step: 2
+  lr: 3.0e-5
+  kl_coeff: 0.02
+  micro_batch: 2
+  grad_clip: 1.0
+  adv_eps: 1.0e-4
+  shared_group_seed: true
+  save_every: 5
+  log_every: 1
+  save_images: false
+  save_prompts: false
+
+  # --- validation (data.val_split_csv) ------------------
+  val_every: 456
+  val_max_layouts: 0
+  val_sample: false
+  val_score: true
